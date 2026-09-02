@@ -23,4 +23,23 @@
 hs_err_pid*
 replay_pid*
 
+# VSCode Configuration
 .vscode/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build output
+out/
+target/
+
+# Gradle
+.gradle/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
