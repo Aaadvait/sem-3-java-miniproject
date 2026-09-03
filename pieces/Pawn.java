@@ -1,7 +1,8 @@
 public class Pawn extends Piece{
     boolean has_moved = false;
-    Pawn(String pc, int[] pos){
-        super(pc, pos);
+    Pawn(char pieceType, int index, char pc){
+        super(pieceType, index, pc);
     }
 }
-//hi
+
+//Piece is conveted into a Pawn.
