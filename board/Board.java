@@ -29,3 +29,23 @@ public class Board{
 
     }
 }
+
+/* 
+        1   2   3   4   5   6   7   8
+
+    1   wr1 wh1 wb1 wk1 wq1 wb2 wh2 wr2
+
+    2   wp1 wp2 wp3 wp4 wp5 wp6 wp7 wp8
+
+    3
+
+    4
+
+    5
+
+    6
+
+    7   bp1 bp2 bp3 bp4 bp5 bp6 bp7 bp8      
+
+    8   br1 bh1 bb1 bk1 bq1 bb2 bh2 br2 
+*/
