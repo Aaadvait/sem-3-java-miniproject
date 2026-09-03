@@ -6,9 +6,7 @@ public class Board{
     "BP1", "BP2", "BP3", "BP4", "BP5", "BP6", "BP7", "BP8",
     "BK1", "BQ1", "BB1", "BB2", "BH1", "BH2", "BR1", "BR2",
     };
-    // The format of the pieces is "color_name_index". '_' is delimiter for seprating values
-    // The values will be seprated in a loop and then fed into the proper piece Classes
-
+    
     int[][] boardPositions = new int[8][8];
     char pieceName, pieceColor, pieceIndex;
     void generateBoard(){
