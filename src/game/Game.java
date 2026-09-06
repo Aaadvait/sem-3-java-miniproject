@@ -5,11 +5,12 @@ import pieces.*;
 
 public class Game {
 
-    public void gameRun(boolean newGame){
-        //Board
+    public void gameRun(char savedGame){
+        //Objects 
         Board B = new Board();
-
-        //Generating Peices
+        //Ascess Peice object -> B.board[][]
+        
+        //Generating Peices and placing them on the board
         Piece[] P = new Piece[32];
         int index;
         char type, color;
@@ -21,5 +22,8 @@ public class Game {
             B.board[P[i].posX][P[i].posY] = P[i];
         }
         //Getting Positions From files
+        {
+            //Open savedGame to get the Stringvalues
+        }
     }
 }
