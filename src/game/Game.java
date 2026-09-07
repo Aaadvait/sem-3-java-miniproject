@@ -5,7 +5,7 @@ import pieces.*;
 
 public class Game {
 
-    public void gameRun(char savedGame){
+    public void gameRun(String savedGame){
         //Objects 
         Board B = new Board();
         //Ascess Peice object -> B.board[][]
