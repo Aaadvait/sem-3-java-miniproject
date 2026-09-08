@@ -47,8 +47,8 @@ public class Board{
     public void displayBoard(){
         for(int row = 0; row < 8; row++){
             for(int col = 0; col < 8; col++){
-                if(board[row][col] == null) System.out.print(" NULL");
-                else System.out.print("  " + board[row][col].pieceName);
+                if(board[row][col] == null) System.out.print("  -  ");
+                else System.out.print(" " + board[row][col].pieceName + " ");
             }
             System.out.println("\n");
         }
