@@ -1,5 +1,7 @@
 package move;
 
-public class Move{
+import pieces.Piece;
 
+//Contains Move Rules
+public class Move{
 }

@@ -8,21 +8,25 @@ public class Piece{
     public char pieceColor  = '\0';
     public String pieceName = "\0";
 
+
     //Peice Attributes
     public int posX, posY;
     public boolean isDead = false;
     public int moveNumber = 0;
+    public boolean exists = false;
 
     public Piece(){
         //Default Constructor
+        exists = false;
     }
 
-    public Piece(char type, int index, char pc){	
+    public Piece(char type, int index, char pc, boolean placedOnBoard){	
         pieceColor = pc;
         intitPos(type, index, pc);
         pieceIndex = index;
         pieceType  = type;
         pieceName  = "" + pc + type + index;
+        exists = placedOnBoard;
     }
 
     void intitPos(char pieceType, int index, char pc){
