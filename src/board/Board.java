@@ -1,5 +1,6 @@
 package board;
 
+import move.Move;
 import pieces.Piece;
 
 public class Board{
@@ -54,16 +55,30 @@ public class Board{
         }
     }
 
-    public void movePiece(int[] nextPos, Piece selPiece, String[] moveStack){
+    public void movePiece(int[] nextPos, Piece selPiece, Move move){
         Piece Temp;
         if(board[nextPos[1]][nextPos[0]] == null){
             board[selPiece.posY][selPiece.posX] = null;
+            move.moveStack[++move.stackTop] = "" + selPiece.pieceName+selPiece.posY+selPiece.posX+nextPos[1]+nextPos[0];
             selPiece.posY = nextPos[1];
             selPiece.posX = nextPos[0];
+            selPiece.moveNumber++;
             board[nextPos[1]][nextPos[0]] = selPiece;
         } else {
-            
+            board[selPiece.posY][selPiece.posX] = null;
+            move.moveStack[++move.stackTop] = ""
+                                + selPiece.pieceName
+                                + selPiece.posY + selPiece.posX
+                                + nextPos[1]    + nextPos[0]
+                                + "x"
+                                + board[nextPos[1]][nextPos[0]].pieceName
+                                + board[nextPos[1]][nextPos[0]].moveNumber;
+            selPiece.posY = nextPos[1];
+            selPiece.posX = nextPos[0];
+            selPiece.moveNumber++;
+            board[nextPos[1]][nextPos[0]] = selPiece;
         }
+
     }
 }
 

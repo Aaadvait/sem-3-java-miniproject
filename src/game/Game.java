@@ -12,9 +12,6 @@ public class Game {
         Board B = new Board(savedGame);
         Piece P = new Piece();
         Move M = new Move();
-
-        //MoveStack
-        String[] moveStack = new String[1000];
         
         //Ascess Peice object -> B.board[][]
 
@@ -23,9 +20,17 @@ public class Game {
         B.displayBoard();
 
         int[] nextplace = {3,3};
-        B.movePiece(nextplace, B.board[1][3], moveStack);
-
+        B.movePiece(nextplace, B.board[1][3], M);
         System.out.println(" --- AFTER MOVE ---");
-        B.displayBoard();
+        B.displayBoard(); System.out.println("MOVE STACK: " + M.moveStack[M.stackTop]);
+
+        nextplace[0] = 4; nextplace[1] = 4;
+        B.movePiece(nextplace, B.board[6][4], M);
+        System.out.println(" --- AFTER MOVE ---");
+        B.displayBoard(); System.out.println("MOVE STACK: " + M.moveStack[M.stackTop]);
+
+        B.movePiece(nextplace, B.board[3][3], M);
+        System.out.println(" --- AFTER MOVE ---");
+        B.displayBoard(); System.out.println("MOVE STACK: " + M.moveStack[M.stackTop]);
     }
 }
