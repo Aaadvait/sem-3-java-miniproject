@@ -1,0 +1,6 @@
+set FX="C:\JavaFX\javafx-sdk-27\lib"
+javac --release 11 --module-path %FX% --add-modules javafx.controls,javafx.fxml *.java
+java --module-path %FX% --add-modules javafx.controls,javafx.fxml Main
+
+
+gives error cause javaFX is of version 69 (i.e JDK27) but it wants javaFX 55 (i.e JDK11)

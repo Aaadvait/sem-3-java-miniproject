@@ -11,9 +11,8 @@ public class Piece{
 
     //Peice Attributes
     public int posX, posY;
-    public boolean isDead = false;
     public int moveNumber = 0;
-    public boolean exists = false;
+    public boolean exists;
 
     public Piece(){
         //Default Constructor
