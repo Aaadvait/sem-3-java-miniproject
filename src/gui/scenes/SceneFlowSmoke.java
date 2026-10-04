@@ -70,7 +70,7 @@ public class SceneFlowSmoke extends Application {
     }
 
     private void enterGame(Stage stage) {
-        click(base.modePane.fiveMinModeButton);
+        click(base.modePane.blitz5Button);
 
         check("game pane created", base.gamePane != null);
         if (base.gamePane == null) {

@@ -1,7 +1,7 @@
 import game.runTest;
 import gui.ChessUI;
 
-class Main{
+public class Main {
     public static void main(String[] args){
         boolean test = false;
         if (!test) {
