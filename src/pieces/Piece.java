@@ -1,108 +1,89 @@
 package pieces;
 
-public class Piece{
-    
-    //Peice Discription
-    public char pieceType   = '\0';
-    public int pieceIndex   =   0 ;
-    public char pieceColor  = '\0';
-    public String pieceName = "\0";
+/**
+ * A single chess piece.
+ *
+ * A Piece knows what it is (color/type) and where it currently stands
+ * (posX/posY, 0-based board coordinates: x = file a..h, y = rank 1..8).
+ * The Board array and these coordinates are always kept in sync by Board.applyMove.
+ */
+public class Piece {
 
+    // --- Piece description --- //
+    public final PieceColor color;
+    public final PieceType type;
+    public final int pieceIndex;        // identity inside its starting group (1..8), kept for naming
+    public final String pieceName;      // e.g. "WP3", "BH2" (existing naming convention)
 
-    //Peice Attributes
+    // --- Piece attributes --- //
     public int posX, posY;
-    public int moveNumber = 0;
+    public int moveNumber = 0;          // how many times this piece has moved (0 = never moved)
     public boolean exists;
 
-    public Piece(){
-        //Default Constructor
-        exists = false;
+    public Piece(char typeCode, int index, char colorCode, boolean placedOnBoard) {
+        this(PieceType.fromCode(typeCode), index, PieceColor.fromCode(colorCode), placedOnBoard);
     }
 
-    public Piece(char type, int index, char pc, boolean placedOnBoard){	
-        pieceColor = pc;
-        intitPos(type, index, pc);
-        pieceIndex = index;
-        pieceType  = type;
-        pieceName  = "" + pc + type + index;
-        exists = placedOnBoard;
+    public Piece(PieceType type, int index, PieceColor color, boolean placedOnBoard) {
+        this.color = color;
+        this.type = type;
+        this.pieceIndex = index;
+        this.pieceName = "" + color.code + type.code + index;
+        this.exists = placedOnBoard;
+        initPos(type, index, color);
     }
 
-    void intitPos(char pieceType, int index, char pc){
+    /** True if this piece belongs to the given color. */
+    public boolean is(PieceColor other) {
+        return color == other;
+    }
 
-        switch (pc) {
-            case 'W':
-                switch (pieceType) {
-                    case 'P':
-                        posX = index;
-                        posY = 2;
-                        break;
-                    case 'R':
-                        if(index == 1) posX = 1;
-                        else posX = 8;
-                        posY = 1;
-                        break;
-                    case 'H':
-                        if(index == 1) posX = 2;
-                        else posX = 7;
-                        posY = 1;
-                        break;
-                    case 'B':
-                        if(index == 1) posX = 3;
-                        else posX = 6;
-                        posY = 1;
-                        break;
-                    case 'K':
-                        posX = 4;
-                        posY = 1;
-                        break;
-                    case 'Q':
-                        posX = 5;
-                        posY = 1;
-                        break;
-                    default:
-                        break;
-                }
+    /** An identical copy at the same square, used for simulating moves without touching the real board. */
+    public Piece duplicate() {
+        Piece copy = new Piece(type, pieceIndex, color, exists);
+        copy.posX = posX;
+        copy.posY = posY;
+        copy.moveNumber = moveNumber;
+        return copy;
+    }
+
+    /** Starting square of a piece (0-based coordinates), from the standard chess setup. */
+    private void initPos(PieceType type, int index, PieceColor color) {
+        int file;   // 0-based file a..h
+        int rank;   // 0-based rank 1..8
+        int homeRank = (color == PieceColor.WHITE) ? 0 : 7;
+
+        switch (type) {
+            case PAWN:
+                file = index - 1;
+                rank = (color == PieceColor.WHITE) ? 1 : 6;
                 break;
-
-            case 'B':
-                switch (pieceType) {
-                    case 'P':
-                        posX = index;
-                        posY = 7;
-                        break;
-                    case 'R':
-                        if(index == 1) posX = 1;
-                        else posX = 8;
-                        posY = 8;
-                        break;
-                    case 'H':
-                        if(index == 1) posX = 2;
-                        else posX = 7;
-                        posY = 8;
-                        break;
-                    case 'B':
-                        if(index == 1) posX = 3;
-                        else posX = 6;
-                        posY = 8;
-                        break;
-                    case 'K':
-                        posX = 4;
-                        posY = 8;
-                        break;
-                    case 'Q':
-                        posX = 5;
-                        posY = 8;
-                        break;
-                    default:
-                        break;
-                }
+            case ROOK:
+                file = (index == 1) ? 0 : 7;
+                rank = homeRank;
+                break;
+            case KNIGHT:
+                file = (index == 1) ? 1 : 6;
+                rank = homeRank;
+                break;
+            case BISHOP:
+                file = (index == 1) ? 2 : 5;
+                rank = homeRank;
+                break;
+            case KING:
+                file = 4;   // e-file, standard starting square
+                rank = homeRank;
+                break;
+            case QUEEN:
+                file = 3;   // d-file, standard starting square
+                rank = homeRank;
                 break;
             default:
-                break;
+                throw new IllegalArgumentException("Unknown piece type: " + type);
         }
-        posX = posX - 1;
-        posY = posY - 1;
+
+        posX = file;
+        posY = rank;
     }
 }
 

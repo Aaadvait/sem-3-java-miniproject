@@ -21,7 +21,7 @@ public class SidePane {
     VBox sidePanel = new VBox();
 
     // ---x--- SIDE BUTTONS ---x---
-    public Button playButton = new Button("NEW");
+    public Button playButton = new Button("PLAY");
     public Button loadButton = new Button("LOAD");
     public Button exitButton = new Button("EXIT");
 
@@ -33,68 +33,60 @@ public class SidePane {
 
         playButton.setMaxWidth(300);
         playButton.setPrefWidth(300);
-        playButton.setFont(cv.NEW_ROCKER_BUTTON);
-        playButton.setTextFill(Color.WHITE);
         loadButton.setMaxWidth(300);
         loadButton.setPrefWidth(300);
-        loadButton.setFont(cv.NEW_ROCKER_BUTTON);
-        loadButton.setTextFill(Color.WHITE);
         exitButton.setMaxWidth(300);
         exitButton.setPrefWidth(300);
-        exitButton.setFont(cv.NEW_ROCKER_BUTTON);
+
+        // NEED to do the TEXT separately as the FONTS are not on System.
+        playButton.setFont(cv.VARELA_BUTTON);
+        playButton.setTextFill(Color.WHITE);
+        loadButton.setFont(cv.VARELA_BUTTON);
+        loadButton.setTextFill(Color.WHITE);
+        exitButton.setFont(cv.VARELA_BUTTON);
         exitButton.setTextFill(Color.WHITE);
 
-        playButton.setStyle(
-                "-fx-background-color: #213b15;" +
-                        "-fx-border-color: #182b10;" +
-                        "-fx-border-width: 2;" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-        );
-        loadButton.setStyle(
-                "-fx-background-color: #213b15;" +
-                        "-fx-border-color: #182b10;" +
-                        "-fx-border-width: 2;" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-        );
-        exitButton.setStyle(
-                        "-fx-background-color: #213b15;" +
-                        "-fx-border-color: #182b10;" +
-                        "-fx-border-width: 2;" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-        );
+        playButton.setStyle(cv.STYLE_BSP);
+        loadButton.setStyle(cv.STYLE_BSP);
+        exitButton.setStyle(cv.STYLE_BSP);
 
         playButton.setOnMouseEntered(event -> {
             scalePlayButton.setToX(1.1);
             scalePlayButton.setToY(1.1);
-            scalePlayButton.play();
+            scalePlayButton.stop();
+            scalePlayButton.playFromStart();
         });
         playButton.setOnMouseExited(event -> {
             scalePlayButton.setToX(1.0);
             scalePlayButton.setToY(1.0);
-            scalePlayButton.play();
+            scalePlayButton.stop();
+            scalePlayButton.playFromStart();
         });
+
         loadButton.setOnMouseEntered(event -> {
             scaleLoadButton.setToX(1.1);
             scaleLoadButton.setToY(1.1);
-            scaleLoadButton.play();
+            scaleLoadButton.stop();
+            scaleLoadButton.playFromStart();
         });
         loadButton.setOnMouseExited(event -> {
             scaleLoadButton.setToX(1.0);
             scaleLoadButton.setToY(1.0);
-            scaleLoadButton.play();
+            scaleLoadButton.stop();
+            scaleLoadButton.playFromStart();
         });
+
         exitButton.setOnMouseEntered(event -> {
             scaleExitButton.setToX(1.1);
             scaleExitButton.setToY(1.1);
-            scaleExitButton.play();
+            scaleExitButton.stop();
+            scaleExitButton.playFromStart();
         });
         exitButton.setOnMouseExited(event -> {
             scaleExitButton.setToX(1.0);
             scaleExitButton.setToY(1.0);
-            scaleExitButton.play();
+            scaleExitButton.stop();
+            scaleExitButton.playFromStart();
         });
 
         sidePanel.setPrefWidth(300);
@@ -102,7 +94,7 @@ public class SidePane {
         sidePanel.setPrefHeight(800);
         sidePanel.setMaxHeight(800);
         sidePanel.setSpacing(50);
-        sidePanel.getChildren().addAll(playButton, loadButton, exitButton);
+        sidePanel.getChildren().addAll(playButton, exitButton);
         sidePanel.setAlignment(Pos.CENTER_LEFT);
 
         root.setAlignment(Pos.CENTER_LEFT);

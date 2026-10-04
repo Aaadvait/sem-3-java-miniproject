@@ -1,6 +1,27 @@
-set FX="C:\JavaFX\javafx-sdk-27\lib"
-javac --release 11 --module-path %FX% --add-modules javafx.controls,javafx.fxml *.java
+-> To Run the Program (from the project root, Windows CMD)
+
+set FX=C:\JavaFX\javafx-sdk-27\lib
+
+:: build everything (the other classes are found automatically via the source path)
+javac --module-path %FX% --add-modules javafx.controls,javafx.fxml,javafx.swing Main.java gui\scenes\SceneFlowSmoke.java
+
+:: run the game
 java --module-path %FX% --add-modules javafx.controls,javafx.fxml Main
 
+NOTE: do NOT use "--release 11" with javac - the JavaFX 27 jars are newer
+class files and the build fails. The commands above are verified with JDK 26.
 
-gives error cause javaFX is of version 69 (i.e JDK27) but it wants javaFX 55 (i.e JDK11)
+
+-> Engine tests (no JavaFX needed, exits with code 1 if a test fails)
+
+java game.runTest
+
+
+-> GUI journey smoke test (intro -> PLAY -> 5 MIN -> game -> checkmate -> back
+   to menu; prints PASS/FAIL lines and writes smoke_*.png snapshots)
+
+java --module-path %FX% --add-modules javafx.controls,javafx.fxml,javafx.swing gui.scenes.SceneFlowSmoke
+
+
+-> To Remove that clutter
+del /s /q *.class

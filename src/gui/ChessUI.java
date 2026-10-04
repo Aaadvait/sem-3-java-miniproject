@@ -18,11 +18,9 @@ public class ChessUI extends Application{
 
     @Override
     public void start(Stage stage) throws Exception {
-
-        // --- REMOVE LATER ---
-        BaseScene ts = new BaseScene();
-
         CommonValues cv = new CommonValues();
+
+        BaseScene ts = new BaseScene();
 
         //WindowDisplayInfo
         Image stageIcon = new Image("gui/resources/chess.png");

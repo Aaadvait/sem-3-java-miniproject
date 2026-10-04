@@ -9,7 +9,7 @@ class Main{
             // --- STARTING UP APP --- //
             ChessUI chessUI = new ChessUI();
             chessUI.runChessUI(args);
-        } else{
+        } else {
           runTest T = new runTest();
           T.test(args);
         }
