@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run Chess Game (JavaFX)",
+            "request": "launch",
+            "mainClass": "Main",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build Chess Game",
+            "vmArgs": "--enable-native-access=javafx.graphics --module-path \"C:/javafx-sdk-27/lib\" --add-modules javafx.controls,javafx.graphics,javafx.swing",
+            "classPaths": [
+                "${workspaceFolder}/out"
+            ]
+        }
+    ]
+}

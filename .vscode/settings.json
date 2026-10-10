@@ -1,0 +1,8 @@
+{
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "out",
+    "java.project.referencedLibraries": [
+        "C:/javafx-sdk-27/lib/*.jar"
+    ],
+    "java.debug.settings.console": "integratedTerminal"
+}

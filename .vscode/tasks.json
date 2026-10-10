@@ -1,0 +1,13 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Chess Game",
+            "type": "shell",
+            "command": "${workspaceFolder}\\scripts\\build.bat",
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": "$javac",
+            "group": { "kind": "build", "isDefault": true }
+        }
+    ]
+}
