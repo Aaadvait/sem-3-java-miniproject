@@ -373,6 +373,20 @@ public class Game {
         }
     }
 
+    /** A player resigns. The opponent of the current turn wins. */
+    public void resign() {
+        resign(board.state.turn);
+    }
+
+    /** Resigns for a specified player; needed for network games where it may not be their turn. */
+    public void resign(PieceColor loser) {
+        if (!isGameOver()) {
+            pauseClock();
+            endGame(GameStatus.RESIGNATION, loser == null ? null : loser.other());
+            if (listener != null) listener.onGameOver(status, winner);
+        }
+    }
+
     /** Neither side has enough material to force checkmate. */
     private boolean hasInsufficientMaterial() {
         int minors = 0;

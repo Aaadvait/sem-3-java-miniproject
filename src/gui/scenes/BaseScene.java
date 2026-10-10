@@ -5,6 +5,7 @@ import game.Game;
 import game.GameMode;
 import gui.CommonValues;
 import gui.scenes.panes.*;
+import gui.scenes.panes.GamePane;
 import network.NetworkGame;
 import persistence.GameSaver;
 
@@ -119,6 +120,10 @@ public class BaseScene {
             modePane.selectOpponentType(false, true);
             openNetworkLobby();
         });
+        modePane.onlineButton.setOnMouseClicked(e -> {
+            modePane.selectOpponentType(false, false);
+            openOnlineLobby();
+        });
 
         // Background.
         background.setFitHeight(cv.HEIGHT);
@@ -176,9 +181,18 @@ public class BaseScene {
     }
 
     void playButton() {
-        modePane.moveBackButton.setByY(100);
+        // The mode overlay is hidden after navigating back. Re-show it from a
+        // deterministic starting position instead of accumulating relative
+        // TranslateTransition offsets across repeated visits.
+        modePane.moveBackButton.stop();
+        modePane.moveModePanel.stop();
+        modePane.root.setVisible(true);
+        modePane.root.setMouseTransparent(false);
+        modePane.mainPanelSetForEntry();
+        modePane.backButton.setTranslateY(-100);
+        modePane.moveBackButton.setToY(0);
         modePane.moveBackButton.setInterpolator(Interpolator.EASE_OUT);
-        modePane.moveModePanel.setByY(700);        // extended for the extra rows
+        modePane.moveModePanel.setToY(0);        // slide the complete mode panel into view
         modePane.moveModePanel.setInterpolator(Interpolator.EASE_OUT);
 
         moveIntroPane.setByX(500);
@@ -189,6 +203,7 @@ public class BaseScene {
         moveBackground.setByY(50);
         moveBackground.setInterpolator(Interpolator.EASE_BOTH);
 
+        modePane.moveModePanel.setOnFinished(null);
         modePane.moveBackButton.play();
         modePane.moveModePanel.play();
         moveIntroPane.play();
@@ -232,7 +247,7 @@ public class BaseScene {
     }
 
     void statsButton() {
-        stage = (Stage) scene.getWindow();
+        stage = resolveStage();
         if (stage == null) return;
         StatsPane sp = new StatsPane(() -> {
             if (stage != null) stage.setScene(scene);
@@ -260,10 +275,22 @@ public class BaseScene {
     }
 
     void bacKButton() {
-        modePane.moveBackButton.setByY(-100);
+        // Reset AI controls before the reverse animation. Otherwise the AI
+        // difficulty row can remain visible at the top edge of the main menu.
+        modePane.resetForMenu();
+        modePane.moveBackButton.stop();
+        modePane.moveModePanel.stop();
+        modePane.root.setVisible(true);
+        modePane.moveBackButton.setToY(-100);
         modePane.moveBackButton.setInterpolator(Interpolator.EASE_IN);
-        modePane.moveModePanel.setByY(-700);
+        modePane.moveModePanel.setToY(-700);
         modePane.moveModePanel.setInterpolator(Interpolator.EASE_IN);
+        modePane.moveModePanel.setOnFinished(event -> {
+            // Do not leave off-screen controls rendered above the main menu.
+            modePane.root.setVisible(false);
+            modePane.mainPanelSetForEntry();
+            modePane.backButton.setTranslateY(-100);
+        });
 
         moveIntroPane.setByX(-500);
         moveIntroPane.setInterpolator(Interpolator.EASE_OUT);
@@ -288,7 +315,7 @@ public class BaseScene {
 
     /** Starts a fresh local (human vs human) game. */
     void startGame(GameMode mode) {
-        stage = (Stage) scene.getWindow();
+        stage = resolveStage();
         if (stage == null) return;
         if (gamePane != null) gamePane.dispose();
         gamePane = new GamePane(mode,
@@ -307,7 +334,7 @@ public class BaseScene {
 
     /** Starts a game vs the AI. */
     void startAIGame(GameMode mode, AILevel level) {
-        stage = (Stage) scene.getWindow();
+        stage = resolveStage();
         if (stage == null) return;
         if (gamePane != null) gamePane.dispose();
         // AI always plays as Black.
@@ -319,7 +346,7 @@ public class BaseScene {
 
     /** Opens the LAN lobby. */
     void openNetworkLobby() {
-        stage = (Stage) scene.getWindow();
+        stage = resolveStage();
         if (stage == null) return;
         NetworkPane np = new NetworkPane(
                 ng -> startNetworkGame(ng),
@@ -328,11 +355,24 @@ public class BaseScene {
         stage.setScene(np.scene);
     }
 
+    /** Opens the cross-network online lobby. A public relay server must be configured/deployed. */
+    void openOnlineLobby() {
+        stage = resolveStage();
+        if (stage == null) return;
+        OnlinePane pane = new OnlinePane(
+                ng -> startNetworkGame(ng),
+                () -> { if (stage != null) stage.setScene(scene); bacKButton(); },
+                err -> System.err.println("Online network error: " + err));
+        stage.setScene(pane.scene);
+    }
+
     /** Called when a NetworkGame is fully established (both players connected). */
     void startNetworkGame(NetworkGame ng) {
         if (stage == null) return;
         if (gamePane != null) gamePane.dispose();
-        gamePane = new GamePane(GameMode.UNTIMED,
+        // IMPORTANT: use the same Game instance that NetworkGame validates against.
+        // Creating a second Game here makes remote moves get validated against a stale board.
+        gamePane = new GamePane(ng.getGame(),
                 () -> { /* no new game in LAN */ },
                 () -> returnToMenu());
         gamePane.setNetworkGame(ng);
@@ -341,7 +381,7 @@ public class BaseScene {
 
     /** Loads a saved game from a move list and opens it in the GamePane in replay mode. */
     void startLoadedGame(List<Move> moves) {
-        stage = (Stage) scene.getWindow();
+        stage = resolveStage();
         if (stage == null) return;
         if (gamePane != null) gamePane.dispose();
         gamePane = new GamePane(GameMode.UNTIMED,
@@ -356,13 +396,40 @@ public class BaseScene {
         stage.setScene(gamePane.scene);
     }
 
+    /**
+     * Resolve the window from the currently displayed scene. When a game is
+     * active, the main-menu Scene is detached from the Stage and getWindow()
+     * returns null; always check the current GamePane before giving up.
+     */
+    private Stage resolveStage() {
+        if (scene.getWindow() instanceof Stage) {
+            stage = (Stage) scene.getWindow();
+        } else if (gamePane != null && gamePane.scene.getWindow() instanceof Stage) {
+            stage = (Stage) gamePane.scene.getWindow();
+        }
+        return stage;
+    }
+
     /** Returns to the main menu from any game screen. */
     public void returnToMenu() {
+        resolveStage();
         if (gamePane != null) {
             gamePane.dispose();
             gamePane = null;
         }
         if (stage != null) stage.setScene(scene);
+
+        // Fully reset the mode overlay before the reverse transition. This prevents
+        // stale AI controls (Beginner/Easy/Hard/Expert) remaining over the main menu.
+        modePane.selectOpponentType(false, false);
+        modePane.root.setMouseTransparent(true);
+        modePane.root.setVisible(true);
+        modePane.moveModePanel.stop();
+        modePane.moveBackButton.stop();
+        modePane.moveModePanel.setByY(-700);
+        modePane.moveBackButton.setByY(-100);
+        modePane.root.setTranslateX(0);
+
         bacKButton();
     }
 

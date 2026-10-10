@@ -9,7 +9,8 @@ public enum GameStatus {
     INSUFFICIENT_MATERIAL,   // neither side can force mate
     THREEFOLD_REPETITION,    // the same position occurred three times
     FIFTY_MOVE_RULE,         // 50 moves without a pawn move or capture
-    ABANDONED;               // the game was left before it finished
+    ABANDONED,               // the game was left before it finished
+    RESIGNATION;             // a player resigned
 
     public boolean isGameOver() {
         return this != PLAYING;

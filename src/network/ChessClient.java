@@ -54,7 +54,8 @@ public class ChessClient {
     public void connect(String playerName) {
         Thread t = new Thread(() -> {
             try {
-                socket = new Socket(host, port);
+                socket = new Socket();
+                socket.connect(new InetSocketAddress(host, port), 5000); // 5 second timeout
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
                 writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
                 connected = true;
@@ -87,6 +88,12 @@ public class ChessClient {
     public void sendDrawAccept()     { send(NetworkProtocol.drawAccept()); }
     public void sendDrawDecline()    { send(NetworkProtocol.drawDecline()); }
     public void sendPing()           { send(NetworkProtocol.ping()); }
+
+    /** Requests a new room on the public online relay server. */
+    public void createOnlineRoom()   { send("ROOM_CREATE"); }
+
+    /** Joins an existing room on the public online relay server. */
+    public void joinOnlineRoom(String roomCode) { send("ROOM_JOIN " + roomCode.trim().toUpperCase(java.util.Locale.ROOT)); }
 
     public boolean isConnected() { return connected; }
 

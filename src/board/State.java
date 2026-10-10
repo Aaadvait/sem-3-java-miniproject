@@ -80,6 +80,24 @@ public class State {
         enPassantY = -1;
     }
 
+    /** Restores this instance in place, preserving references held by game/UI code. */
+    public void restoreFrom(State s) {
+        turn = s.turn;
+        castleWhiteKingside = s.castleWhiteKingside;
+        castleWhiteQueenside = s.castleWhiteQueenside;
+        castleBlackKingside = s.castleBlackKingside;
+        castleBlackQueenside = s.castleBlackQueenside;
+        enPassantX = s.enPassantX;
+        enPassantY = s.enPassantY;
+        checkWhite = s.checkWhite;
+        checkBlack = s.checkBlack;
+        checkmateWhite = s.checkmateWhite;
+        checkmateBlack = s.checkmateBlack;
+        stalemate = s.stalemate;
+        halfmoveClock = s.halfmoveClock;
+        fullmoveNumber = s.fullmoveNumber;
+    }
+
     /** Full copy of this state (used to save/restore state around a move). */
     public State copy() {
         State s = new State();

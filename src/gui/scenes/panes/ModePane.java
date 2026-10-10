@@ -43,7 +43,8 @@ public class ModePane {
     private final HBox opponentRow  = new HBox(30);
     public  Button localButton      = createModeButton("LOCAL");
     public  Button vsAIButton       = createModeButton("VS AI");
-    public  Button lanButton        = createModeButton("PLAY LAN");
+    public  Button lanButton        = createModeButton("LAN PLAY");
+    public  Button onlineButton     = createModeButton("ONLINE PLAY");
 
     // ---x--- TIME CONTROL ROW ---x--- //
     private final VBox timeSection  = new VBox(12);
@@ -53,14 +54,14 @@ public class ModePane {
     private final HBox rapidRow     = new HBox(20);
     private final HBox classicalRow = new HBox(20);
 
-    public Button bullet1Button     = createSmallButton("1+0 Bullet");
-    public Button bullet2Button     = createSmallButton("2+1 Bullet");
-    public Button blitz3Button      = createSmallButton("3+0 Blitz");
-    public Button blitz5Button      = createSmallButton("5+0 Blitz");
-    public Button rapid10Button     = createSmallButton("10+0 Rapid");
-    public Button rapid15Button     = createSmallButton("15+10 Rapid");
-    public Button rapid30Button     = createSmallButton("30+0 Rapid");
-    public Button classicalButton   = createSmallButton("60+30 Classical");
+    public Button bullet1Button     = createSmallButton("1+0");
+    public Button bullet2Button     = createSmallButton("2+1");
+    public Button blitz3Button      = createSmallButton("3+0");
+    public Button blitz5Button      = createSmallButton("5+0");
+    public Button rapid10Button     = createSmallButton("10+0");
+    public Button rapid15Button     = createSmallButton("15+10");
+    public Button rapid30Button     = createSmallButton("30+0");
+    public Button classicalButton   = createSmallButton("60+30");
     public Button untimedButton     = createSmallButton("Untimed");
 
     // ---x--- AI DIFFICULTY ROW (shown only when VS AI selected) ---x--- //
@@ -105,7 +106,7 @@ public class ModePane {
 
         // Opponent row.
         opponentRow.setAlignment(Pos.CENTER);
-        opponentRow.getChildren().addAll(localButton, vsAIButton, lanButton);
+        opponentRow.getChildren().addAll(localButton, vsAIButton, lanButton, onlineButton);
 
         // Time control rows.
         bulletRow.setAlignment(Pos.CENTER);
@@ -141,6 +142,7 @@ public class ModePane {
         localButton.setOnMouseClicked(e -> selectOpponentType(false, false));
         vsAIButton .setOnMouseClicked(e -> selectOpponentType(true,  false));
         lanButton  .setOnMouseClicked(e -> selectOpponentType(false, true));
+        onlineButton.setOnMouseClicked(e -> selectOpponentType(false, false));
 
         // Wire time-control buttons.
         bullet1Button  .setOnMouseClicked(e -> selectMode(GameMode.BULLET_1));
@@ -173,6 +175,22 @@ public class ModePane {
     // STATE LOGIC
     // =========================================================================
 
+    /** Reset the mode overlay before returning to the main menu. */
+    public void resetForMenu() {
+        selectOpponentType(false, false);
+        resetHighlight(onlineButton);
+        resetHighlight(lanButton);
+        resetHighlight(vsAIButton);
+        resetHighlight(localButton);
+        aiSection.setVisible(false);
+        aiSection.setManaged(false);
+    }
+
+    /** Put the panel at its known off-screen start position before opening it. */
+    public void mainPanelSetForEntry() {
+        mainPanel.setTranslateY(-700);
+    }
+
     public void selectOpponentType(boolean vsAI, boolean lan) {
         this.isVsAI = vsAI;
         this.isLAN  = lan;
@@ -181,6 +199,7 @@ public class ModePane {
         resetHighlight(localButton);
         resetHighlight(vsAIButton);
         resetHighlight(lanButton);
+        resetHighlight(onlineButton);
         if (vsAI) highlightButton(vsAIButton);
         else if (lan) highlightButton(lanButton);
         else highlightButton(localButton);
@@ -189,10 +208,13 @@ public class ModePane {
         aiSection.setVisible(vsAI);
         aiSection.setManaged(vsAI);
 
-        // Reset selections.
+        // Reset all selections and highlights so nothing persists from a previous game.
         selectedMode  = null;
         selectedLevel = null;
+        resetAllModeHighlights();
+        resetAIHighlights();
     }
+
 
     public void selectMode(GameMode mode) {
         this.selectedMode = mode;
@@ -241,7 +263,9 @@ public class ModePane {
             "-fx-border-color: #ffffff;" +
             "-fx-border-width: 3;" +
             "-fx-border-radius: 5;" +
-            "-fx-background-radius: 5;");
+            "-fx-background-radius: 5;" +
+            "-fx-focus-color: transparent;" +
+            "-fx-faint-focus-color: transparent;");
     }
 
     private void resetHighlight(Button b) {
@@ -282,13 +306,15 @@ public class ModePane {
     private Button createModeButton(String text) {
         Button button = new Button(text);
         button.setAlignment(Pos.CENTER);
-        button.setPrefSize(160, 150);
-        button.setMinSize(160, 150);
-        button.setMaxSize(160, 150);
-        button.setFont(cv.VARELA_BUTTON);
+        button.setPrefSize(175, 145);
+        button.setMinSize(175, 145);
+        button.setMaxSize(175, 145);
+        button.setWrapText(false);
+        button.setEllipsisString("");
+        button.setPadding(new Insets(8));
+        button.setFont(javafx.scene.text.Font.font("Varela Round", 21));
         button.setTextFill(Color.WHITE);
         button.setStyle(cv.STYLE_BMP);
-        button.setWrapText(true);
         ScaleTransition scale = new ScaleTransition(Duration.millis(20), button);
         button.setOnMouseEntered(e -> { scale.setToX(1.1); scale.setToY(1.1); scale.stop(); scale.playFromStart(); });
         button.setOnMouseExited( e -> { scale.setToX(1.0); scale.setToY(1.0); scale.stop(); scale.playFromStart(); });
@@ -299,13 +325,15 @@ public class ModePane {
     private Button createSmallButton(String text) {
         Button button = new Button(text);
         button.setAlignment(Pos.CENTER);
-        button.setPrefSize(180, 60);
-        button.setMinSize(180, 60);
-        button.setMaxSize(180, 60);
-        button.setFont(cv.VARELA_BUTTON);
+        button.setPrefSize(142, 58);
+        button.setMinSize(142, 58);
+        button.setMaxSize(142, 58);
+        button.setWrapText(false);
+        button.setEllipsisString("");
+        button.setPadding(new Insets(6, 8, 6, 8));
+        button.setFont(javafx.scene.text.Font.font("Varela Round", 20));
         button.setTextFill(Color.WHITE);
         button.setStyle(cv.STYLE_BMP);
-        button.setWrapText(true);
         ScaleTransition scale = new ScaleTransition(Duration.millis(20), button);
         button.setOnMouseEntered(e -> { scale.setToX(1.08); scale.setToY(1.08); scale.stop(); scale.playFromStart(); });
         button.setOnMouseExited( e -> { scale.setToX(1.00); scale.setToY(1.00); scale.stop(); scale.playFromStart(); });

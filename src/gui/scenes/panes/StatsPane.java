@@ -47,24 +47,17 @@ public class StatsPane {
         background.fitWidthProperty().bind(root.widthProperty());
         background.fitHeightProperty().bind(root.heightProperty());
 
-        StatsStore whiteStats = new StatsStore("White");
-        StatsStore blackStats = new StatsStore("Black");
+        // Title.
+        Text title = new Text("STATISTICS");
+        title.setFont(cv.NEW_ROCKER_BIG);
+        title.setFill(Color.WHITE);
 
-        // Load WebView with HTML/JS
-        javafx.scene.web.WebView webView = new javafx.scene.web.WebView();
-        webView.setPrefSize(800, 600);
-        webView.setMaxSize(800, 600);
-        
-        try {
-            java.net.URL url = getClass().getResource("/gui/resources/stats.html");
-            if (url != null) {
-                String htmlUrl = url.toExternalForm() + 
-                    String.format("?wg=%d&ww=%d&wl=%d&wd=%d&wwr=%.1f&wacc=%.1f&bg=%d&bw=%d&bl=%d&bd=%d&bwr=%.1f&bacc=%.1f",
-                        whiteStats.gamesPlayed(), whiteStats.wins(), whiteStats.losses(), whiteStats.draws(), whiteStats.winRate(), whiteStats.averageAccuracy(),
-                        blackStats.gamesPlayed(), blackStats.wins(), blackStats.losses(), blackStats.draws(), blackStats.winRate(), blackStats.averageAccuracy());
-                webView.getEngine().load(htmlUrl);
-            }
-        } catch(Exception e) { e.printStackTrace(); }
+        // Cards for White and Black.
+        VBox whiteCard = buildPlayerCard("White", new StatsStore("White"));
+        VBox blackCard = buildPlayerCard("Black", new StatsStore("Black"));
+
+        HBox cardsRow = new HBox(60, whiteCard, blackCard);
+        cardsRow.setAlignment(Pos.CENTER);
 
         // Back button.
         ImageView backIcon = new ImageView(
@@ -79,7 +72,7 @@ public class StatsPane {
         backButton.setOnMouseExited( e -> { scaleBack.setToX(1.0); scaleBack.setToY(1.0); scaleBack.stop(); scaleBack.playFromStart(); });
 
         // Layout.
-        VBox content = new VBox(20, webView);
+        VBox content = new VBox(40, title, cardsRow);
         content.setAlignment(Pos.CENTER);
 
         root.getChildren().addAll(background, content, backButton);
@@ -87,5 +80,50 @@ public class StatsPane {
         StackPane.setMargin(backButton, new Insets(20));
 
         scene = new Scene(root, cv.WIDTH, cv.HEIGHT, Color.BLACK);
+    }
+
+    // =========================================================================
+    // CARD BUILDER
+    // =========================================================================
+
+    private VBox buildPlayerCard(String playerName, StatsStore stats) {
+        Label nameLabel = new Label(playerName.toUpperCase());
+        nameLabel.setFont(cv.NEW_ROCKER_MEDIUM);
+        nameLabel.setTextFill(Color.WHITE);
+        nameLabel.setAlignment(Pos.CENTER);
+
+        Label gamesLabel    = statLine("Games Played", stats.gamesPlayed());
+        Label winsLabel     = statLine("Wins",         stats.wins());
+        Label lossesLabel   = statLine("Losses",       stats.losses());
+        Label drawsLabel    = statLine("Draws",        stats.draws());
+        Label winRateLabel  = statLineD("Win Rate",    stats.winRate(), "%");
+        Label accuracyLabel = statLineD("Avg Accuracy", stats.averageAccuracy(), "%");
+
+        VBox card = new VBox(12, nameLabel, gamesLabel, winsLabel,
+                lossesLabel, drawsLabel, winRateLabel, accuracyLabel);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setPadding(new Insets(30));
+        card.setStyle(
+                "-fx-background-color: #06182bdd;" +
+                "-fx-border-color: #cceeee;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 12;" +
+                "-fx-background-radius: 12;");
+        card.setMinWidth(320);
+        return card;
+    }
+
+    private Label statLine(String name, int value) {
+        Label l = new Label(name + ":  " + value);
+        l.setFont(cv.VARELA_BUTTON);
+        l.setTextFill(Color.WHITE);
+        return l;
+    }
+
+    private Label statLineD(String name, double value, String unit) {
+        Label l = new Label(String.format("%s:  %.1f%s", name, value, unit));
+        l.setFont(cv.VARELA_BUTTON);
+        l.setTextFill(Color.web("#9fc6e0"));
+        return l;
     }
 }

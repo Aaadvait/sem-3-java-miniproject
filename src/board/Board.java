@@ -188,7 +188,7 @@ public class Board {
             }
         }
 
-        state = m.previousState;
+        state.restoreFrom(m.previousState);
         m.previousState = null;
     }
 

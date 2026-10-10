@@ -49,18 +49,24 @@ public class CommonValues {
                     "-fx-border-color: #cceeee;" +
                     "-fx-border-width: 2;" +
                     "-fx-border-radius: 5;" +
-                    "-fx-background-radius: 5;";
+                    "-fx-background-radius: 5;" +
+                    "-fx-focus-color: transparent;" +
+                    "-fx-faint-focus-color: transparent;";
 
     public final String STYLE_BMP =
                     "-fx-background-color: #0096ff;" +
                     "-fx-border-color: #cceeee;" +
                     "-fx-border-width: 2;" +
                     "-fx-border-radius: 5;" +
-                    "-fx-background-radius: 5;";
+                    "-fx-background-radius: 5;" +
+                    "-fx-focus-color: transparent;" +
+                    "-fx-faint-focus-color: transparent;";
 
     public final String STYLE_BBMP =
                     "-fx-background-color: transparent;" +
-                    "-fx-border-color: transparent;";
+                    "-fx-border-color: transparent;" +
+                    "-fx-focus-color: transparent;" +
+                    "-fx-faint-focus-color: transparent;";
 
     // Game screen styles
 
@@ -99,5 +105,7 @@ public class CommonValues {
                     "-fx-border-color: #35597a;" +
                     "-fx-border-width: 1;" +
                     "-fx-border-radius: 6;" +
-                    "-fx-background-radius: 6;";
+                    "-fx-background-radius: 6;" +
+                    "-fx-focus-color: transparent;" +
+                    "-fx-faint-focus-color: transparent;";
 }

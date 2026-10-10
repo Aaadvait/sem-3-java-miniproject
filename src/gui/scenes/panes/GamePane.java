@@ -175,7 +175,7 @@ public class GamePane implements Game.Listener {
     }
 
     /** Core constructor — all others delegate here. */
-    private GamePane(Game game, Runnable onNewGame, Runnable onExitToMenu) {
+    public GamePane(Game game, Runnable onNewGame, Runnable onExitToMenu) {
         this.game         = game;
         this.onNewGame    = onNewGame;
         this.onExitToMenu = onExitToMenu;
@@ -255,23 +255,33 @@ public class GamePane implements Game.Listener {
         VBox.setVgrow(moveList, Priority.ALWAYS);
 
         // Control buttons row.
-        undoButton = sideButton("⏪ Undo");
-        redoButton = sideButton("Redo ⏩");
-        saveButton = sideButton("💾 Save");
+        undoButton = sideButton("UNDO");
+        redoButton = sideButton("REDO");
+        saveButton = sideButton("SAVE");
+        // Equal widths keep labels centered and prevent the controls from colliding.
+        for (Button button : List.of(undoButton, redoButton, saveButton)) {
+            button.setMinWidth(0);
+            button.setPrefWidth(94);
+            button.setMaxWidth(94);
+            button.setMinHeight(42);
+            button.setPrefHeight(42);
+            button.setMaxHeight(42);
+            button.setWrapText(false);
+            button.setEllipsisString("");
+            button.setAlignment(Pos.CENTER);
+            button.setPadding(new Insets(4, 3, 4, 3));
+        }
         undoButton.setOnMouseClicked(e -> doUndo());
         redoButton.setOnMouseClicked(e -> doRedo());
         saveButton.setOnMouseClicked(e -> doSave());
-        HBox controlRow = new HBox(8, undoButton, redoButton, saveButton);
+        HBox controlRow = new HBox(5, undoButton, redoButton, saveButton);
         controlRow.setAlignment(Pos.CENTER);
         controlRow.setPrefWidth(300);
-        HBox.setHgrow(undoButton, Priority.ALWAYS);
-        HBox.setHgrow(redoButton, Priority.ALWAYS);
-        HBox.setHgrow(saveButton, Priority.ALWAYS);
 
         // Replay controls.
-        replayPrevButton = sideButton("◀ Prev");
-        replayNextButton = sideButton("Next ▶");
-        replayExitButton = sideButton("❌ Exit");
+        replayPrevButton = sideButton("◀");
+        replayNextButton = sideButton("▶");
+        replayExitButton = sideButton("EXIT REPLAY");
         replayExitButton.setPrefWidth(150);
         replayPrevButton.setOnMouseClicked(e -> replayStep(-1));
         replayNextButton.setOnMouseClicked(e -> replayStep(+1));
@@ -280,9 +290,6 @@ public class GamePane implements Game.Listener {
         replayBar.setAlignment(Pos.CENTER);
         replayBar.setVisible(false);
         replayBar.setManaged(false);
-        HBox.setHgrow(replayPrevButton, Priority.ALWAYS);
-        HBox.setHgrow(replayNextButton, Priority.ALWAYS);
-        HBox.setHgrow(replayExitButton, Priority.ALWAYS);
 
         // Menu button (UNCHANGED style from original).
         Button menuButton = new Button("MENU");
@@ -294,16 +301,15 @@ public class GamePane implements Game.Listener {
         withHoverScale(menuButton);
         menuButton.setOnMouseClicked(event -> onMenuClicked());
 
-        // PGN / FEN export buttons.
-        Button pgnButton = sideButton("📋 PGN");
-        Button fenButton = sideButton("📋 FEN");
-        pgnButton.setOnMouseClicked(e -> copyToClipboard(
-                game.toPGN(resultString()), "PGN copied!"));
-        fenButton.setOnMouseClicked(e -> copyToClipboard(game.toFEN(), "FEN copied!"));
-        HBox exportRow = new HBox(8, pgnButton, fenButton);
-        exportRow.setAlignment(Pos.CENTER);
-        HBox.setHgrow(pgnButton, Priority.ALWAYS);
-        HBox.setHgrow(fenButton, Priority.ALWAYS);
+        // RESIGN button.
+        Button resignButton = new Button("RESIGN");
+        resignButton.setFont(cv.VARELA_BUTTON);
+        resignButton.setTextFill(Color.WHITE);
+        resignButton.setStyle("-fx-background-color: #8b0000; -fx-background-radius: 5; -fx-border-color: #ff4444; -fx-border-width: 1; -fx-border-radius: 5; -fx-focus-color: transparent; -fx-faint-focus-color: transparent;");
+        resignButton.setPrefWidth(300);
+        resignButton.setPrefHeight(50);
+        withHoverScale(resignButton);
+        resignButton.setOnMouseClicked(e -> doResign());
 
         VBox blackClockBox = new VBox(4, blackCaption, blackClock);
         blackClockBox.setAlignment(Pos.CENTER);
@@ -318,7 +324,7 @@ public class GamePane implements Game.Listener {
         sidePanel.setStyle(cv.STYLE_GAME_PANEL);
         sidePanel.getChildren().addAll(
                 blackClockBox, moveList, openingLabel, turnLabel, checkLabel,
-                whiteClockBox, controlRow, replayBar, exportRow, menuButton);
+                whiteClockBox, controlRow, replayBar, resignButton, menuButton);
 
         HBox content = new HBox(40, boardPane, sidePanel);
         content.setAlignment(Pos.CENTER);
@@ -351,7 +357,11 @@ public class GamePane implements Game.Listener {
         b.setTextFill(Color.WHITE);
         b.setStyle(cv.STYLE_BSP);
         b.setPrefHeight(44);
-        b.setMaxWidth(Double.MAX_VALUE);
+        b.setMinHeight(44);
+        b.setAlignment(Pos.CENTER);
+        b.setWrapText(false);
+        b.setEllipsisString("");
+        b.setPadding(new Insets(4, 4, 4, 4));
         withHoverScale(b);
         return b;
     }
@@ -515,29 +525,87 @@ public class GamePane implements Game.Listener {
     }
 
     // =========================================================================
+    // RESIGN
+    // =========================================================================
+
+    private void doResign() {
+        if (game.isGameOver()) return;
+        // Show confirmation overlay.
+        Text question = new Text("RESIGN THE GAME?");
+        question.setFont(cv.NEW_ROCKER_MEDIUM);
+        question.setFill(Color.WHITE);
+
+        Text warning = new Text("You will lose this game.");
+        warning.setFont(cv.VARELA_BUTTON);
+        warning.setFill(Color.web("#9fc6e0"));
+
+        Button yesButton = overlayButton("YES, RESIGN");
+        yesButton.setOnMouseClicked(event -> {
+            hideOverlay();
+            // In network mode, notify opponent.
+            if (networkGame != null) {
+                networkGame.sendResign();
+                game.resign(networkGame.getMyColor());
+            } else {
+                game.resign();
+            }
+        });
+        Button noButton = overlayButton("KEEP PLAYING");
+        noButton.setOnAction(event -> hideOverlay());
+
+        HBox buttons = new HBox(30, yesButton, noButton);
+        buttons.setAlignment(Pos.CENTER);
+        VBox content = new VBox(24, question, warning, buttons);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(40, 60, 40, 60));
+        showOverlay(overlayPanel(content));
+    }
+
+    // =========================================================================
     // NETWORK GAME SUPPORT
     // =========================================================================
 
     /** Attaches this pane to an active network game. */
     public void setNetworkGame(NetworkGame ng) {
         this.networkGame = ng;
+        // Undo/redo are local-history operations and would desynchronise the two boards.
+        // Keep them unavailable in LAN games; saving remains local and safe.
+        undoButton.setDisable(true);
+        redoButton.setDisable(true);
+        undoButton.setTooltip(new Tooltip("Undo is disabled in LAN multiplayer."));
+        redoButton.setTooltip(new Tooltip("Redo is disabled in LAN multiplayer."));
+        // Wire the move callback so opponent moves update our board.
+        ng.setOnMoveReceived(this::applyOpponentMove);
+        // Wire resign/draw events.
         ng.setOnGameEvent(this::handleNetworkEvent);
+    }
+
+    /**
+     * Applies a move that arrived from the network opponent.
+     * Does NOT send the move back (that would cause an infinite loop).
+     */
+    private void applyOpponentMove(Move m) {
+        if (m == null || game.isGameOver()) return;
+        Runnable apply = () -> {
+            clearSelection();
+            boolean ok = game.tryMove(m.fromX, m.fromY, m.toX, m.toY, m.promotion);
+            if (!ok) {
+                // The received move was matched against the current position. If local
+                // validation disagrees, do not silently continue with a desynchronised board.
+                System.err.println("LAN move rejected; local board may be out of sync: " + m);
+                return;
+            }
+            refresh();
+        };
+        if (Platform.isFxApplicationThread()) apply.run(); else Platform.runLater(apply);
     }
 
     private void handleNetworkEvent(String line) {
         String cmd = network.NetworkProtocol.command(line);
         switch (cmd) {
-            case network.NetworkProtocol.MOVE:
-                int[] parts = network.NetworkProtocol.parseMove(
-                        network.NetworkProtocol.payload(line));
-                if (parts == null) break;
-                PieceType promo = promoFromChar((char) parts[4]);
-                attemptMove(parts[0], parts[1], parts[2], parts[3], promo);
-                break;
             case network.NetworkProtocol.RESIGN:
-                PieceColor winner = networkGame.getMyColor();
-                game.abandon();
-                showGameOver();
+                // Resignation must identify the actual LAN player, not whichever side is to move.
+                game.resign(networkGame == null ? game.turn() : networkGame.getMyColor().other());
                 break;
             case network.NetworkProtocol.DRAW_OFFER:
                 showDrawOffer();
@@ -834,7 +902,7 @@ public class GamePane implements Game.Listener {
             button.setStyle(cv.STYLE_BSP);
             button.setPrefSize(110, 110);
             withHoverScale(button);
-            button.setOnMouseClicked(event -> {
+            button.setOnAction(event -> {
                 hideOverlay();
                 attemptMove(promoFromX, promoFromY, promoToX, promoToY, type);
             });
@@ -857,9 +925,18 @@ public class GamePane implements Game.Listener {
         reason.setFill(Color.web("#9fc6e0"));
 
         Button newGameButton = overlayButton("NEW GAME");
-        newGameButton.setOnMouseClicked(event -> onNewGame.run());
+        boolean canStartNewGame = onNewGame != null;
+        newGameButton.setOnAction(event -> {
+            if (canStartNewGame) onNewGame.run();
+        });
+        // Network sessions need a new room/rematch handshake; don't present a
+        // no-op control as if it were working.
+        if (networkGame != null) {
+            newGameButton.setDisable(true);
+            newGameButton.setText("NEW GAME (RECONNECT)");
+        }
         Button backButton = overlayButton("BACK TO MENU");
-        backButton.setOnMouseClicked(event -> exitToMenu());
+        backButton.setOnAction(event -> exitToMenu());
 
         // Stats panel inside overlay.
         Label statsLabel = new Label(buildStatsText());
@@ -886,9 +963,9 @@ public class GamePane implements Game.Listener {
         warning.setFill(Color.web("#9fc6e0"));
 
         Button yesButton = overlayButton("YES, LEAVE");
-        yesButton.setOnMouseClicked(event -> exitToMenu());
+        yesButton.setOnAction(event -> exitToMenu());
         Button noButton = overlayButton("KEEP PLAYING");
-        noButton.setOnMouseClicked(event -> hideOverlay());
+        noButton.setOnAction(event -> hideOverlay());
 
         HBox buttons = new HBox(30, yesButton, noButton);
         buttons.setAlignment(Pos.CENTER);
@@ -905,13 +982,13 @@ public class GamePane implements Game.Listener {
 
         Button acceptButton = overlayButton("ACCEPT DRAW");
         Button declineButton = overlayButton("DECLINE");
-        acceptButton.setOnMouseClicked(e -> {
+        acceptButton.setOnAction(e -> {
             hideOverlay();
             if (networkGame != null) networkGame.sendDrawAccept();
             game.abandon();
             showGameOver();
         });
-        declineButton.setOnMouseClicked(e -> {
+        declineButton.setOnAction(e -> {
             hideOverlay();
             if (networkGame != null) networkGame.sendDrawDecline();
         });
@@ -951,6 +1028,7 @@ public class GamePane implements Game.Listener {
             case THREEFOLD_REPETITION:  return "Threefold Repetition";
             case FIFTY_MOVE_RULE:       return "Fifty-Move Rule";
             case ABANDONED:             return "Game Abandoned";
+            case RESIGNATION:           return "by Resignation";
             default:                    return "";
         }
     }
