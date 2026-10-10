@@ -373,6 +373,10 @@ public class BaseScene {
     /** Brief status label shown in the intro pane area when no stage-level alert is available. */
     private void showMenuToast(String msg) {
         System.out.println("[Menu] " + msg);
-        // In a full implementation this could overlay a transient label on basePane.
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle("Message");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
 }

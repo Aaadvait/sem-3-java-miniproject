@@ -43,7 +43,7 @@ public class ModePane {
     private final HBox opponentRow  = new HBox(30);
     public  Button localButton      = createModeButton("LOCAL");
     public  Button vsAIButton       = createModeButton("VS AI");
-    public  Button lanButton        = createModeButton("LAN");
+    public  Button lanButton        = createModeButton("PLAY LAN");
 
     // ---x--- TIME CONTROL ROW ---x--- //
     private final VBox timeSection  = new VBox(12);
@@ -282,12 +282,13 @@ public class ModePane {
     private Button createModeButton(String text) {
         Button button = new Button(text);
         button.setAlignment(Pos.CENTER);
-        button.setPrefSize(150, 150);
-        button.setMinSize(150, 150);
-        button.setMaxSize(150, 150);
+        button.setPrefSize(160, 150);
+        button.setMinSize(160, 150);
+        button.setMaxSize(160, 150);
         button.setFont(cv.VARELA_BUTTON);
         button.setTextFill(Color.WHITE);
         button.setStyle(cv.STYLE_BMP);
+        button.setWrapText(true);
         ScaleTransition scale = new ScaleTransition(Duration.millis(20), button);
         button.setOnMouseEntered(e -> { scale.setToX(1.1); scale.setToY(1.1); scale.stop(); scale.playFromStart(); });
         button.setOnMouseExited( e -> { scale.setToX(1.0); scale.setToY(1.0); scale.stop(); scale.playFromStart(); });
@@ -298,10 +299,13 @@ public class ModePane {
     private Button createSmallButton(String text) {
         Button button = new Button(text);
         button.setAlignment(Pos.CENTER);
-        button.setPrefSize(120, 60);
+        button.setPrefSize(180, 60);
+        button.setMinSize(180, 60);
+        button.setMaxSize(180, 60);
         button.setFont(cv.VARELA_BUTTON);
         button.setTextFill(Color.WHITE);
         button.setStyle(cv.STYLE_BMP);
+        button.setWrapText(true);
         ScaleTransition scale = new ScaleTransition(Duration.millis(20), button);
         button.setOnMouseEntered(e -> { scale.setToX(1.08); scale.setToY(1.08); scale.stop(); scale.playFromStart(); });
         button.setOnMouseExited( e -> { scale.setToX(1.00); scale.setToY(1.00); scale.stop(); scale.playFromStart(); });

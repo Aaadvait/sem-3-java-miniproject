@@ -255,20 +255,23 @@ public class GamePane implements Game.Listener {
         VBox.setVgrow(moveList, Priority.ALWAYS);
 
         // Control buttons row.
-        undoButton = sideButton("UNDO");
-        redoButton = sideButton("REDO");
-        saveButton = sideButton("SAVE");
+        undoButton = sideButton("⏪ Undo");
+        redoButton = sideButton("Redo ⏩");
+        saveButton = sideButton("💾 Save");
         undoButton.setOnMouseClicked(e -> doUndo());
         redoButton.setOnMouseClicked(e -> doRedo());
         saveButton.setOnMouseClicked(e -> doSave());
         HBox controlRow = new HBox(8, undoButton, redoButton, saveButton);
         controlRow.setAlignment(Pos.CENTER);
         controlRow.setPrefWidth(300);
+        HBox.setHgrow(undoButton, Priority.ALWAYS);
+        HBox.setHgrow(redoButton, Priority.ALWAYS);
+        HBox.setHgrow(saveButton, Priority.ALWAYS);
 
         // Replay controls.
-        replayPrevButton = sideButton("◀");
-        replayNextButton = sideButton("▶");
-        replayExitButton = sideButton("EXIT REPLAY");
+        replayPrevButton = sideButton("◀ Prev");
+        replayNextButton = sideButton("Next ▶");
+        replayExitButton = sideButton("❌ Exit");
         replayExitButton.setPrefWidth(150);
         replayPrevButton.setOnMouseClicked(e -> replayStep(-1));
         replayNextButton.setOnMouseClicked(e -> replayStep(+1));
@@ -277,6 +280,9 @@ public class GamePane implements Game.Listener {
         replayBar.setAlignment(Pos.CENTER);
         replayBar.setVisible(false);
         replayBar.setManaged(false);
+        HBox.setHgrow(replayPrevButton, Priority.ALWAYS);
+        HBox.setHgrow(replayNextButton, Priority.ALWAYS);
+        HBox.setHgrow(replayExitButton, Priority.ALWAYS);
 
         // Menu button (UNCHANGED style from original).
         Button menuButton = new Button("MENU");
@@ -289,13 +295,15 @@ public class GamePane implements Game.Listener {
         menuButton.setOnMouseClicked(event -> onMenuClicked());
 
         // PGN / FEN export buttons.
-        Button pgnButton = sideButton("COPY PGN");
-        Button fenButton = sideButton("COPY FEN");
+        Button pgnButton = sideButton("📋 PGN");
+        Button fenButton = sideButton("📋 FEN");
         pgnButton.setOnMouseClicked(e -> copyToClipboard(
                 game.toPGN(resultString()), "PGN copied!"));
         fenButton.setOnMouseClicked(e -> copyToClipboard(game.toFEN(), "FEN copied!"));
         HBox exportRow = new HBox(8, pgnButton, fenButton);
         exportRow.setAlignment(Pos.CENTER);
+        HBox.setHgrow(pgnButton, Priority.ALWAYS);
+        HBox.setHgrow(fenButton, Priority.ALWAYS);
 
         VBox blackClockBox = new VBox(4, blackCaption, blackClock);
         blackClockBox.setAlignment(Pos.CENTER);
@@ -343,6 +351,7 @@ public class GamePane implements Game.Listener {
         b.setTextFill(Color.WHITE);
         b.setStyle(cv.STYLE_BSP);
         b.setPrefHeight(44);
+        b.setMaxWidth(Double.MAX_VALUE);
         withHoverScale(b);
         return b;
     }
